@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "../Game.h"
 #include "Sprite.h"
+
 #define M_PI_3_4 2.35619449019f
 
 Sprite brickSprite("../resources/brick.png");
@@ -16,6 +17,7 @@ void Camera::update(float deltaTime) {
     int screenHeight = game->getScreenHeight();
     const Player *player = game->getPlayer();
     Map *map = game->getMap();
+    std::wstring rawMap = map->getRawMap();
     Graphics *graphics = game->getGraphics();
     for (int x = 0; x < screenWidth; ++x) {
         float halfFieldOfView = fieldOfView / 2.0f;
@@ -38,25 +40,25 @@ void Camera::update(float deltaTime) {
             if (futureX < 0 || futureX >= map->getWidth() || futureY < 0 || futureY >= map->getHeight()) {
                 wallFound = true;
                 distanceToWall = maxRenderDistance;
-            } else if (map->getRawMap()[futureX * map->getWidth() + futureY] == 'X') {
+            } else if (rawMap[futureX * map->getWidth() + futureY] == 'X') {
                 wallFound = true;
 
-                float fBlockMidX = (float) futureX + 0.5f;
-                float fBlockMidY = (float) futureY + 0.5f;
+                float blockMiddleX = (float) futureX + 0.5f;
+                float blockMiddleY = (float) futureY + 0.5f;
 
-                float fTestPointX = player->getX() + eyeDirectionX * distanceToWall;
-                float fTestPointY = player->getY() + eyeDirectionY * distanceToWall;
+                float futureRayY = player->getY() + eyeDirectionY * distanceToWall;
+                float futureRayX = player->getX() + eyeDirectionX * distanceToWall;
 
-                float fTestAngle = atan2f((fTestPointY - fBlockMidY), (fTestPointX - fBlockMidX));
+                float wallRayAngle = atan2f((futureRayY - blockMiddleY), (futureRayX - blockMiddleX));
 
-                if (fTestAngle >= -M_PI_4 && fTestAngle < M_PI_4)
-                    sampleX = fTestPointY - (float) futureY;
-                if (fTestAngle >= M_PI_4 && fTestAngle < M_PI_3_4)
-                    sampleX = fTestPointX - (float) futureX;
-                if (fTestAngle < -M_PI_4 && fTestAngle >= -M_PI_3_4)
-                    sampleX = fTestPointX - (float) futureX;
-                if (fTestAngle >= M_PI_3_4 || fTestAngle < -M_PI_3_4)
-                sampleX = fTestPointY - (float) futureY;
+                if (wallRayAngle >= -M_PI_4 && wallRayAngle < M_PI_4)
+                    sampleX = futureRayY - (float) futureY;
+                if (wallRayAngle >= M_PI_4 && wallRayAngle < M_PI_3_4)
+                    sampleX = futureRayX - (float) futureX;
+                if (wallRayAngle < -M_PI_4 && wallRayAngle >= -M_PI_3_4)
+                    sampleX = futureRayX - (float) futureX;
+                if (wallRayAngle >= M_PI_3_4 || wallRayAngle < -M_PI_3_4)
+                    sampleX = futureRayY - (float) futureY;
             }
         }
         if (distanceToWall < 0.1f) distanceToWall = 0.1f;
