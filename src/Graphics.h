@@ -12,8 +12,6 @@ private:
 public:
     Graphics(int screenWidth, int screenHeight);
 
-    virtual ~Graphics();
-
     void hijack();
 
     void stop();
