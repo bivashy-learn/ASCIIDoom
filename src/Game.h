@@ -13,7 +13,6 @@
 class Game {
 private:
     int screenWidth, screenHeight;
-    wchar_t *screen;
     Map* map;
     Player* player;
     std::vector<const Entity *> entities;
@@ -27,10 +26,6 @@ public:
     void draw();
 
     void stop();
-
-    void updatePixel(int index, wchar_t character);
-
-    wchar_t *getScreen() const;
 
     const Player *getPlayer();
 

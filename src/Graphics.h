@@ -6,18 +6,21 @@
 class Graphics {
 private:
     HANDLE consoleHandle;
-    int screenWidth, screenHeight;
+    int screenWidth, screenHeight, length;
     DWORD bytesWritten = 0;
+    wchar_t *screen;
 public:
     Graphics(int screenWidth, int screenHeight);
+
+    virtual ~Graphics();
 
     void hijack();
 
     void stop();
 
-    void fill(const wchar_t *rawMap, int length, short x, short y);
+    void update(int x, int y, wchar_t new_character);
 
-    HANDLE getConsoleHandle();
+    void fill(short x, short y);
 };
 
 

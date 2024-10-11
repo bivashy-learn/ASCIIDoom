@@ -15,6 +15,7 @@ void Camera::update(float deltaTime) {
     int screenHeight = game->getScreenHeight();
     const Player *player = game->getPlayer();
     Map *map = game->getMap();
+    Graphics *graphics = game->getGraphics();
     for (int x = 0; x < screenWidth; ++x) {
         float halfFieldOfView = fieldOfView / 2.0f;
         float rayAngle = (player->getDirectionAngle() - halfFieldOfView) + ((float) x / (float) screenWidth) * fieldOfView;
@@ -25,7 +26,7 @@ void Camera::update(float deltaTime) {
         float eyeDirectionY = cosf(rayAngle);
 
         while (!wallFound) {
-            distanceToWall += 0.1f;
+            distanceToWall += 0.01f;
 
             int futureX = (int)(player->getX() + eyeDirectionX * distanceToWall);
             int futureY = (int)(player->getY() + eyeDirectionY * distanceToWall);
@@ -52,13 +53,12 @@ void Camera::update(float deltaTime) {
         }
 
         for (int y = 0; y < screenHeight; ++y) {
-            int index = y * screenWidth + x;
             if (y < ceilingDistance)
-                game->updatePixel(index, L' ');
+                graphics->update(x, y, L' ');
             else if (y >= ceilingDistance && y <= floorDistance)
-                game->updatePixel(index, shade);
+                graphics->update(x, y, shade);
             else {
-                game->updatePixel(index, L' ');
+                graphics->update(x, y, L' ');
             }
         }
     }
