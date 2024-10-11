@@ -16,9 +16,7 @@ public:
 
     void stop();
 
-    void update(int x, int y, std::byte red, std::byte green, std::byte blue);
-
-    void update(int x, int y, wchar_t new_character);
+    void update(int x, int y, wchar_t new_character, int red = 0, int green = 0, int blue = 0, bool background = false);
 
     void fill(short x, short y);
 };

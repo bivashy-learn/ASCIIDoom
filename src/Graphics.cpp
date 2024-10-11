@@ -1,22 +1,39 @@
 #include "Graphics.h"
 
-WORD rgbToConsoleColor(std::byte r, std::byte g, std::byte b) {
+WORD rgbToConsoleColor(int r, int g, int b, bool background) {
     WORD colorAttribute = 0;
-    std::byte colorClamp{128};
+    int colorClamp{128};
 
     if (r > colorClamp)
-        colorAttribute |= FOREGROUND_RED;
+        colorAttribute |= background ? BACKGROUND_RED : FOREGROUND_RED;
     if (g > colorClamp)
-        colorAttribute |= FOREGROUND_GREEN;
+        colorAttribute |= background ? BACKGROUND_GREEN : FOREGROUND_GREEN;
     if (b > colorClamp)
-        colorAttribute |= FOREGROUND_BLUE;
-    if (r > colorClamp || g > colorClamp || b > colorClamp) {
-        colorAttribute |= FOREGROUND_INTENSITY;
-    }
+        colorAttribute |= background ? BACKGROUND_BLUE : FOREGROUND_GREEN;
+    colorAttribute |= background ? BACKGROUND_INTENSITY : FOREGROUND_INTENSITY;
     return colorAttribute;
 }
 
+
+WORD precomputedForegroundColors[256][256][256];
+WORD precomputedBackgroundColors[256][256][256];
+bool colorsComputed = false;
+
+void precomputeColors() {
+    if (colorsComputed) return;
+    for (int i = 0; i < 256; ++i) {
+        for (int j = 0; j < 256; ++j) {
+            for (int k = 0; k < 256; ++k) {
+                precomputedForegroundColors[i][j][k] = rgbToConsoleColor(i, j, k, false);
+                precomputedBackgroundColors[i][j][k] = rgbToConsoleColor(i, j, k, true);
+            }
+        }
+    }
+    colorsComputed = true;
+}
+
 Graphics::Graphics(int screenWidth, int screenHeight) : screenWidth(screenWidth), screenHeight(screenHeight) {
+    precomputeColors();
     consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
     this->length = screenWidth * screenHeight;
     this->renderRectangle = SMALL_RECT{0, 0, 1, 1};
@@ -24,7 +41,7 @@ Graphics::Graphics(int screenWidth, int screenHeight) : screenWidth(screenWidth)
 
 void Graphics::hijack() {
     SetConsoleWindowInfo(consoleHandle, TRUE, &renderRectangle);
-    SetConsoleScreenBufferSize(consoleHandle, {(short)screenWidth, (short) screenWidth});
+    SetConsoleScreenBufferSize(consoleHandle, {(short) screenWidth, (short) screenWidth});
     SetConsoleActiveScreenBuffer(consoleHandle);
     CONSOLE_SCREEN_BUFFER_INFO screenBuffer;
     if (!GetConsoleScreenBufferInfo(consoleHandle, &screenBuffer))
@@ -50,21 +67,19 @@ void Graphics::stop() {
     CloseHandle(consoleHandle);
 }
 
-void Graphics::update(int x, int y, std::byte red, std::byte green, std::byte blue) {
-    screen[y * screenWidth + x].Attributes = rgbToConsoleColor(red, green, blue);
-}
-
-void Graphics::update(int x, int y, wchar_t new_character) {
+void Graphics::update(int x, int y, wchar_t new_character, int red, int green, int blue, bool background) {
     if (y < 0 || x < 0 || y > screenHeight || x > screenWidth)
         throw std::invalid_argument("x or y out of bounds: " + std::to_string(x) + " " + std::to_string(y));
     screen[y * screenWidth + x].Char.UnicodeChar = new_character;
+    screen[y * screenWidth + x].Attributes = background ? precomputedBackgroundColors[red][green][blue]
+                                                        : precomputedForegroundColors[red][green][blue];
 }
 
 void Graphics::fill(short x, short y) {
     if (!WriteConsoleOutputW(consoleHandle,
-                        screen,
-                        {(short) screenWidth, (short) screenHeight},
-                        {x, y},
-                        &renderRectangle))
+                             screen,
+                             {(short) screenWidth, (short) screenHeight},
+                             {x, y},
+                             &renderRectangle))
         throw std::logic_error("WriteConsoleOutputW");
 }
