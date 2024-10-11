@@ -7,7 +7,6 @@ class Game;
 class Camera {
 private:
     float fieldOfView = 3.14159f / 4.0f;
-    std::vector<short> wallShades;
     float maxRenderDistance;
     Game* game;
 public:
