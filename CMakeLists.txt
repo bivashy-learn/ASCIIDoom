@@ -3,15 +3,6 @@ project(DoomConsole)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(DoomConsole main.cpp
-        Game.cpp
-        Game.h
-        Graphics.cpp
-        Graphics.h
-        model/Entity.h
-        model/Camera.cpp
-        model/Camera.h
-        model/Map.cpp
-        model/Map.h
-        model/Player.cpp
-        model/Player.h)
+set(SRC_DIR src)
+file(GLOB_RECURSE SOURCES "${SRC_DIR}/*.cpp" "${SRC_DIR}/*.h")
+add_executable(DoomConsole ${SOURCES})

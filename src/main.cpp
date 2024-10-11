@@ -3,7 +3,7 @@
 #include "Game.h"
 
 int main() {
-    int width = 120, height = 40;
+    int width = 320, height = 240;
     int mapWidth = 16, mapHeight = 16;
     std::wstring rawMap;
     rawMap += L"XXXXXXXXXXXXXXXX";
