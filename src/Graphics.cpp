@@ -8,10 +8,6 @@ Graphics::Graphics(int screenWidth, int screenHeight) : screenWidth(screenWidth)
     this->length = screenWidth * screenHeight;
 }
 
-Graphics::~Graphics() {
-    delete[] screen;
-}
-
 void Graphics::hijack() {
     HWND consoleWindowHandle = GetConsoleWindow();
 
