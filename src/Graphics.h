@@ -7,14 +7,16 @@ class Graphics {
 private:
     HANDLE consoleHandle;
     int screenWidth, screenHeight, length;
-    DWORD bytesWritten = 0;
-    wchar_t *screen;
+    SMALL_RECT renderRectangle;
+    CHAR_INFO *screen;
 public:
     Graphics(int screenWidth, int screenHeight);
 
     void hijack();
 
     void stop();
+
+    void update(int x, int y, std::byte red, std::byte green, std::byte blue);
 
     void update(int x, int y, wchar_t new_character);
 

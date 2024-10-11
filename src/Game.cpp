@@ -1,7 +1,9 @@
 #include "Game.h"
 
 
-Game::Game(int screenWidth, int screenHeight, Map *map, Player *player) : screenWidth(screenWidth), screenHeight(screenHeight), map(map), player(player) {
+Game::Game(int screenWidth, int screenHeight, Map *map, Player *player) : screenWidth(screenWidth),
+                                                                          screenHeight(screenHeight), map(map),
+                                                                          player(player) {
     this->screenWidth = screenWidth;
     this->screenHeight = screenHeight;
     this->graphics = std::make_unique<Graphics>(Graphics(screenWidth, screenHeight));
